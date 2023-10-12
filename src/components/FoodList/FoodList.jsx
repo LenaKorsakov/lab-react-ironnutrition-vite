@@ -9,8 +9,8 @@ import EmptyArray from '../EmptyArray/EmptyArray';
 
 function FoodList() {
   const [foods, setFoods] = useState(foodsJson);
-  const [isSearching, setIsSearching] = useState(false);
-  const [displayedFoods, setDisplayedFoods] = useState(null);
+
+  const [searchName, setSearchName] = useState('');
 
   const onButtonDelete = (id) => {
     const filteredFoods = foods.filter((food) => food.id !== id);
@@ -25,44 +25,34 @@ function FoodList() {
     setFoods(copy);
   };
 
-  const onSearchInput = (value) => {
-    const filteredFoods = !value
-      ? foods
-      : foods.filter((food) => food.name.includes(value));
-    setIsSearching(true);
-    setDisplayedFoods(filteredFoods);
-  };
-
-  const onIsSearching = (flag) => {
-    setIsSearching(flag);
-  };
+  let foodsToDisplay;
+  if (searchName === '') {
+    foodsToDisplay = foods;
+  } else {
+    foodsToDisplay = foods.filter((food) =>
+      food.name.toUpperCase().includes(searchName.toUpperCase())
+    );
+  }
 
   return (
     <>
-      <Search onSearchInput={onSearchInput} onIsSearching={onIsSearching} />
+      <Search search={searchName} setSearchName={setSearchName} />
       <AddFoodForm onAddFood={onAddFood} />
       <h2>Food List</h2>
       <div className="container">
-        {foods.length === 0 && <EmptyArray />}
-        {isSearching
-          ? displayedFoods.map((food) => {
-              return (
-                <FoodBox
-                  food={food}
-                  key={food.id}
-                  onButtonDelete={onButtonDelete}
-                />
-              );
-            })
-          : foods.map((food) => {
-              return (
-                <FoodBox
-                  food={food}
-                  key={food.id}
-                  onButtonDelete={onButtonDelete}
-                />
-              );
-            })}
+        {foods.length !== 0 ? (
+          foodsToDisplay.map((food) => {
+            return (
+              <FoodBox
+                food={food}
+                key={food.id}
+                onButtonDelete={onButtonDelete}
+              />
+            );
+          })
+        ) : (
+          <EmptyArray />
+        )}
       </div>
     </>
   );
